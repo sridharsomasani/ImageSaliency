@@ -1,7 +1,7 @@
 # ImageSaliency
 Calculates Contrast based Saliency Map of the Image
 
-![Leaf](https://github.com/sridharsomasani/ImageSaliency/blob/master/images/saliency_formula.PNG)
+![Leaf](https://github.com/sridharsomasani/ImageSaliency/blob/master/images/saliency_formula.png)
 
 It takes two input parameters
 
