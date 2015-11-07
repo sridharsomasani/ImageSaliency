@@ -102,7 +102,7 @@ void salient_map(IplImage* image, int patch_size, int k_dissimilarity, char* nam
 
 	float* salient_data = (float*) salient_image->imageData;
 	int salient_step = salient_image->widthStep/sizeof(float);
-
+	// calculate and store saliency map for each pixel
 	for(row = offset; row <= rows-offset; ){
 		for(col = offset; col <= cols-offset; ){
 			salient = 0;
@@ -170,6 +170,7 @@ float calculate_patch_saliency(IplImage* image, int patch_size, int k_dissimilar
 
 // calculate dissimilarity of two patches
 float calculate_dissimilarity(IplImage* image, int row, int col, int current_row, int current_col, IplImage* avg_color, IplImage* avg_pos){
+	float constant_c = 3;
 	float tmp_color = 0;
 	float tmp_pos = 0;
 	int i;
@@ -185,7 +186,8 @@ float calculate_dissimilarity(IplImage* image, int row, int col, int current_row
 			d_pos = d_pos + (tmp_pos*tmp_pos);
 		}
 	}
-	d_pos *= 3;
+	// constant value c as in the formula
+	d_pos *= constant_c;
 	d_pos++;
 	return d_color/d_pos;
 }
@@ -206,6 +208,7 @@ void calc_avg_normalize_rgb(IplImage* image, int patch_size, int row, int col, f
 	avg_color[0] = avg_color[1] = avg_color[2] = 0;
 	int offset = patch_size == 1 ? 1 : patch_size/2;
 	int row_i, col_j;
+	// normalize pixel data with # pixels and maximum pixel data for each pixel (255)
 	float normal = 255.0*patch_size*patch_size;
 	for(row_i = row-offset; row_i <= row+offset; row_i++){
 		for(col_j = col-offset; col_j <= col+offset; col_j++){
@@ -214,13 +217,13 @@ void calc_avg_normalize_rgb(IplImage* image, int patch_size, int row, int col, f
 			avg_color[2] += get_pixel(image, row_i, col_j, 2);
 		}
 	}
-	
+	// normalize summed pixel RGB data
 	avg_color[0] = avg_color[0]/ normal;
 	avg_color[1] = avg_color[1]/ normal;
 	avg_color[2] = avg_color[2]/ normal;
 }
 
-
+// pixel data from float array
 float get_float(IplImage* image, int rows, int cols, int channel){
 	
 	float* image_data = (float*) image->imageData;
@@ -229,7 +232,7 @@ float get_float(IplImage* image, int rows, int cols, int channel){
 	return image_data[index];
 }
 
-// get pixel value
+// get pixel value from unsigned character array
 uchar get_pixel(IplImage* image, int rows, int cols, int channel){
 	int index = rows*image->widthStep + cols*image->nChannels + channel;
 	if(channel > image->nChannels){
@@ -242,6 +245,7 @@ uchar get_pixel(IplImage* image, int rows, int cols, int channel){
 	return image->imageData[index];
 }
 
+// helper function to sort the dissimilarity array
 int float_comp(const void* elem1, const void* elem2){
     if(*(const float*)elem1 < *(const float*)elem2)
         return -1;
